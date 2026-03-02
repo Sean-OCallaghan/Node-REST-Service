@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  db2:
+    image: ibmcom/db2
+    container_name: db2
+    platform: linux/amd64
+    privileged: true
+    ports:
+      - "50000:50000"
+    environment:
+      LICENSE: accept
+      DB2INSTANCE: db2inst1
+      DB2INST1_PASSWORD: password
+      DBNAME: testdb
+    volumes:
+      - db2data:/database
+      - ./db2-init:/var/custom
+
+volumes:
+  db2data:
