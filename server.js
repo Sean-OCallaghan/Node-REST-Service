@@ -23,12 +23,15 @@ async function initDb() {
   });
 }
 
+/**
+ * POST Create Users
+ */
 app.post("/users", async (req, res) => {
-  const { name, email } = req.body;
+  const { name, email, mobile } = req.body;
 
-  const sql = `INSERT INTO USERS (NAME, EMAIL) VALUES (?, ?)`;
+  const sql = `INSERT INTO USERS (NAME, EMAIL, MOBILE) VALUES (?, ?)`;
 
-  db.query(sql, [name, email], (err, data) => {
+  db.query(sql, [name, email, mobile], (err, data) => {
     if (err) {
       console.error(err);
       return res.status(500).json(err);
@@ -38,6 +41,28 @@ app.post("/users", async (req, res) => {
   });
 });
 
+/**
+ * PUT User by ID
+ */
+app.put("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, email, mobile } = req.body;
+
+  const sql = `UPDATE USERS SET NAME = ?, EMAIL = ?, MOBILE = ? WHERE ID = ?`;
+
+  db.query(sql, [name, email, mobile, id], (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json(err);
+    }
+
+    res.json({ message: "User updated" });
+  });
+});
+
+/**
+ * GET Users
+ */
 app.get("/users", async (req, res) => {
   const sql = `SELECT id, name, email, mobile FROM db2inst1.users`;
   const result = await db.query(sql);
@@ -49,6 +74,27 @@ app.get("/users", async (req, res) => {
     }
 
     res.json(data);
+  });
+});
+
+/**
+ * GET User By ID
+ */
+app.get("/users/:id", (req, res) => {
+  const { id } = req.params;
+  const sql = `SELECT * FROM db2inst1.users WHERE id = ?`;
+
+  db.query(sql, [id], (err, data) => {
+    if (err) {
+      console.error("DB Error:", err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+
+    if (data.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(data[0]);
   });
 });
 
